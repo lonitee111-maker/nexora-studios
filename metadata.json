@@ -1,0 +1,6 @@
+{
+  "name": "Nexora AI Academy",
+  "description": "Learn AI. Master Prompts. Build Anything. Powered by Nexora Studios.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
