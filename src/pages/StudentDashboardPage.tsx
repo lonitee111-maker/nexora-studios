@@ -16,13 +16,16 @@ import {
   ShieldCheck,
   Printer,
   User as UserIcon,
-  Play
+  Play,
+  Receipt,
+  UploadCloud,
+  CheckCircle2
 } from 'lucide-react';
 import { CertificateModal } from '../components/certificate/CertificateModal.js';
 import { UserCertificate } from '../types/index.js';
 
 export const StudentDashboardPage: React.FC = () => {
-  const { user, courses, prompts, navigate, copyPrompt } = useApp();
+  const { user, courses, prompts, navigate, copyPrompt, receipts, setReceiptModalOpen } = useApp();
   const [activeCert, setActiveCert] = useState<UserCertificate | null>(null);
   const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
 
@@ -152,6 +155,107 @@ export const StudentDashboardPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Bank Transfer Receipts & Access Verification Status */}
+      {(() => {
+        const studentReceipts = receipts.filter(
+          r => r.studentEmail === user.email || r.studentName.toLowerCase().includes(user.name.toLowerCase())
+        );
+
+        return (
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0d0f1f] to-black border border-purple-500/25 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-cyan-400">
+                  <Receipt className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-base text-white">
+                    Bank Transfer Receipts & Access Verification
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Track the status of your direct bank transfers and review approval by lead administrator DE PHANTOM.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setReceiptModalOpen(true)}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-purple-600 hover:bg-purple-500 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span>Upload New Transfer Receipt</span>
+              </button>
+            </div>
+
+            {studentReceipts.length === 0 ? (
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/5 text-xs text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <span>No manual transfer receipts submitted yet. Prefer paying via bank transfer instead of card?</span>
+                <button
+                  onClick={() => setReceiptModalOpen(true)}
+                  className="text-cyan-300 hover:underline font-semibold cursor-pointer"
+                >
+                  View Accounts & Submit Proof →
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                {studentReceipts.map(rcp => (
+                  <div
+                    key={rcp.id}
+                    className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-2.5 text-xs"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold font-mono text-purple-300 uppercase">
+                        {rcp.plan.replace('_', ' ')}
+                      </span>
+                      {rcp.status === 'pending' && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> Pending DE PHANTOM Approval
+                        </span>
+                      )}
+                      {rcp.status === 'approved' && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Full Pro Access Active
+                        </span>
+                      )}
+                      {rcp.status === 'rejected' && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                          Rejected
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex justify-between text-slate-300">
+                      <span className="text-slate-400">Amount Paid:</span>
+                      <span className="font-mono font-bold text-white">{rcp.currency} {rcp.amount.toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between text-slate-300">
+                      <span className="text-slate-400">Bank & Reference:</span>
+                      <span className="font-mono text-cyan-300 truncate max-w-[200px]" title={rcp.transactionReference}>
+                        {rcp.bankName.split(' ')[0]} • {rcp.transactionReference}
+                      </span>
+                    </div>
+
+                    {rcp.status === 'approved' && rcp.reviewedBy && (
+                      <div className="text-[11px] text-emerald-300/90 bg-emerald-950/20 p-2 rounded-lg border border-emerald-500/20">
+                        ✓ Confirmed by {rcp.reviewedBy} at {rcp.reviewedAt}. Full access registered.
+                      </div>
+                    )}
+
+                    {rcp.status === 'pending' && (
+                      <div className="text-[11px] text-amber-300/90 bg-amber-950/20 p-2 rounded-lg border border-amber-500/20">
+                        ⏳ Transfer slip under review by DE PHANTOM. Access will unlock automatically once confirmed.
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Enrolled Courses Section */}
       <div className="space-y-6">

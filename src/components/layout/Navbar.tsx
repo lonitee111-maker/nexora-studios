@@ -42,11 +42,13 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNav('home')}>
-            <div className="relative flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 p-0.5 shadow-lg shadow-purple-500/20 group">
-              <div className="w-full h-full bg-[#07070f] rounded-[10px] flex items-center justify-center transition-colors group-hover:bg-[#07070f]/80">
-                <Sparkles className="w-5 h-5 text-purple-400 group-hover:rotate-12 transition-transform duration-300" />
-              </div>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => handleNav('home')}>
+            <div className="relative flex items-center justify-center w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-amber-400 via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all duration-300">
+              <img
+                src="/assets/nexora-logo.jpeg"
+                alt="Nexora Studios Logo"
+                className="w-full h-full rounded-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -58,7 +60,7 @@ export const Navbar: React.FC = () => {
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 font-medium tracking-tight">
-                Powered by <span className="text-cyan-400 font-semibold">Nexora Studios</span>
+                Powered by <span className="text-amber-300 font-semibold">Nexora Studios</span>
               </p>
             </div>
           </div>

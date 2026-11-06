@@ -8,7 +8,23 @@ export const AboutPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       {/* Hero */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <div className="text-center max-w-3xl mx-auto space-y-5">
+        <div className="flex flex-col items-center justify-center">
+          <div className="relative group">
+            <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-amber-400 via-purple-600 to-cyan-400 opacity-70 blur-xl group-hover:opacity-100 transition duration-500 animate-pulse"></div>
+            <div className="relative w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-amber-400 via-purple-600 to-cyan-400 shadow-2xl shadow-purple-600/40">
+              <img
+                src="/assets/nexora-logo.jpeg"
+                alt="Nexora Studios Emblem"
+                className="w-full h-full rounded-full object-cover"
+              />
+            </div>
+          </div>
+          <div className="mt-3 text-xs font-mono font-bold text-amber-300 uppercase tracking-widest">
+            Nexora Studios • Building Beyond Imagination
+          </div>
+        </div>
+
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono font-bold uppercase">
           <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
           <span>POWERED BY NEXORA STUDIOS</span>

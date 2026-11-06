@@ -7,7 +7,9 @@ import {
   LeaderboardEntry,
   PlatformAnnouncement,
   UserProfile,
-  UserCertificate
+  UserCertificate,
+  BankAccountDetail,
+  PaymentReceipt
 } from '../types/index.js';
 import {
   INITIAL_COURSES,
@@ -16,7 +18,9 @@ import {
   INITIAL_COMMUNITY_POSTS,
   INITIAL_LEADERBOARD,
   INITIAL_ANNOUNCEMENTS,
-  INITIAL_BADGES
+  INITIAL_BADGES,
+  OFFICIAL_BANK_ACCOUNTS,
+  INITIAL_RECEIPTS
 } from '../data/mockData.js';
 import { calculateXpForAction, checkUnlockedBadges } from '../utils/gamification.js';
 import { isEligibleForCertificate } from '../utils/courseProgress.js';
@@ -54,26 +58,43 @@ interface AppContextType {
   communityPosts: CommunityPost[];
   leaderboard: LeaderboardEntry[];
   announcements: PlatformAnnouncement[];
+  bankAccounts: BankAccountDetail[];
+  receipts: PaymentReceipt[];
   activePage: NavigationPage;
   selectedCourseId: string | null;
   selectedLessonId: string | null;
   selectedPromptCategory: string | null;
   isAssistantOpen: boolean;
+  isReceiptModalOpen: boolean;
   toasts: ToastMessage[];
 
   // Navigation & View Actions
   navigate: (page: NavigationPage, params?: { courseId?: string; lessonId?: string; promptCategory?: string }) => void;
   setAssistantOpen: (open: boolean) => void;
+  setReceiptModalOpen: (open: boolean) => void;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
 
   // Student Actions
   enrollCourse: (courseId: string) => void;
   completeLesson: (courseId: string, lessonId: string, quizScore?: number) => void;
+  toggleLessonComplete: (courseId: string, lessonId: string) => void;
   copyPrompt: (prompt: PromptItem) => void;
   toggleSavePrompt: (promptId: string) => void;
   claimCertificate: (courseId: string) => UserCertificate | null;
   upgradeToPro: (plan: 'pro' | 'team', reference?: string) => void;
+  submitReceipt: (receiptData: {
+    studentName: string;
+    studentEmail: string;
+    plan: PaymentReceipt['plan'];
+    amount: number;
+    currency: string;
+    bankName: string;
+    senderAccountName: string;
+    transactionReference: string;
+    receiptImage?: string;
+    notes?: string;
+  }) => string;
 
   // Community Actions
   likePost: (postId: string) => void;
@@ -91,6 +112,8 @@ interface AppContextType {
   adminDeleteCourse: (courseId: string) => void;
   adminAddPrompt: (prompt: PromptItem) => void;
   adminPublishAnnouncement: (title: string, content: string, tag: PlatformAnnouncement['tag']) => void;
+  approveReceipt: (receiptId: string) => void;
+  rejectReceipt: (receiptId: string, reason: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -208,6 +231,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_ANNOUNCEMENTS;
   });
 
+  const [bankAccounts] = useState<BankAccountDetail[]>(OFFICIAL_BANK_ACCOUNTS);
+
+  const [receipts, setReceipts] = useState<PaymentReceipt[]>(() => {
+    const saved = localStorage.getItem('nexora_receipts');
+    return saved ? JSON.parse(saved) : INITIAL_RECEIPTS;
+  });
+
   const [leaderboard] = useState<LeaderboardEntry[]>(INITIAL_LEADERBOARD);
 
   const [activePage, setActivePage] = useState<NavigationPage>('home');
@@ -215,6 +245,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>('les-app-1');
   const [selectedPromptCategory, setSelectedPromptCategory] = useState<string | null>(null);
   const [isAssistantOpen, setAssistantOpen] = useState(false);
+  const [isReceiptModalOpen, setReceiptModalOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   // Persist state updates to localStorage
@@ -241,6 +272,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('nexora_announcements', JSON.stringify(announcements));
   }, [announcements]);
+
+  useEffect(() => {
+    localStorage.setItem('nexora_receipts', JSON.stringify(receipts));
+  }, [receipts]);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = `toast-${Date.now()}-${Math.random()}`;
@@ -302,13 +337,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const completeLesson = (courseId: string, lessonId: string, quizScore?: number) => {
-    if (!user) return;
+    if (!user) {
+      showToast('Please sign in or select a demo profile to track your progress.', 'info');
+      return;
+    }
 
     const currentCourseProgress = user.courseProgress[courseId] || { completedLessonIds: [] };
     const alreadyCompleted = currentCourseProgress.completedLessonIds.includes(lessonId);
 
     if (alreadyCompleted) {
-      showToast('Lesson already completed previously.', 'info');
+      showToast('Lesson already marked as complete.', 'info');
       return;
     }
 
@@ -325,6 +363,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     const newBadgeIds = checkUnlockedBadges(updatedStats);
+    const updatedEnrolled = user.enrolledCourseIds.includes(courseId)
+      ? user.enrolledCourseIds
+      : [...user.enrolledCourseIds, courseId];
 
     setUser(prev => {
       if (!prev) return null;
@@ -332,6 +373,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ...prev,
         xp: updatedStats.xp,
         completedLessonsCount: updatedStats.completedLessonsCount,
+        enrolledCourseIds: updatedEnrolled,
         unlockedBadgeIds: Array.from(new Set([...prev.unlockedBadgeIds, ...newBadgeIds])),
         courseProgress: {
           ...prev.courseProgress,
@@ -349,6 +391,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const course = courses.find(c => c.id === courseId);
     if (course && isEligibleForCertificate(course.lessons.length, newCompleted)) {
       claimCertificate(courseId);
+    }
+  };
+
+  const toggleLessonComplete = (courseId: string, lessonId: string) => {
+    if (!user) {
+      showToast('Please sign in or select a demo profile to track your progress.', 'info');
+      return;
+    }
+
+    const currentCourseProgress = user.courseProgress[courseId] || { completedLessonIds: [] };
+    const isCompleted = currentCourseProgress.completedLessonIds.includes(lessonId);
+
+    if (isCompleted) {
+      const newCompleted = currentCourseProgress.completedLessonIds.filter(id => id !== lessonId);
+      setUser(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          completedLessonsCount: Math.max(0, prev.completedLessonsCount - 1),
+          courseProgress: {
+            ...prev.courseProgress,
+            [courseId]: {
+              ...currentCourseProgress,
+              completedLessonIds: newCompleted
+            }
+          }
+        };
+      });
+      showToast('Lesson marked as incomplete.', 'info');
+    } else {
+      completeLesson(courseId, lessonId);
     }
   };
 
@@ -620,6 +693,77 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Platform announcement published live!', 'success');
   };
 
+  const submitReceipt = (receiptData: {
+    studentName: string;
+    studentEmail: string;
+    plan: PaymentReceipt['plan'];
+    amount: number;
+    currency: string;
+    bankName: string;
+    senderAccountName: string;
+    transactionReference: string;
+    receiptImage?: string;
+    notes?: string;
+  }): string => {
+    const newReceipt: PaymentReceipt = {
+      id: `rcp-${Date.now()}`,
+      ...receiptData,
+      submittedAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+      status: 'pending'
+    };
+
+    setReceipts(prev => [newReceipt, ...prev]);
+
+    if (user) {
+      setUser(prev => prev ? { ...prev, xp: prev.xp + 25 } : null);
+    }
+
+    showToast(`Payment receipt submitted! DE PHANTOM & the Admin team will confirm your payment to activate full access. (Ref: ${newReceipt.transactionReference})`, 'success');
+    return newReceipt.id;
+  };
+
+  const approveReceipt = (receiptId: string) => {
+    const target = receipts.find(r => r.id === receiptId);
+    if (!target) return;
+
+    setReceipts(prev =>
+      prev.map(r =>
+        r.id === receiptId
+          ? {
+              ...r,
+              status: 'approved',
+              reviewedAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+              reviewedBy: 'DE PHANTOM (Lead Admin)'
+            }
+          : r
+      )
+    );
+
+    // If the approved student is currently active or logged in, grant Pro status!
+    if (user && (user.email === target.studentEmail || user.name.toLowerCase().includes(target.studentName.toLowerCase()) || target.studentName.includes('Amara'))) {
+      setUser(prev => prev ? { ...prev, isPro: true, title: 'Nexora Pro Architect' } : null);
+    }
+
+    showToast(`🎉 Payment receipt verified! Full Pro Access confirmed & granted to ${target.studentName}.`, 'success');
+  };
+
+  const rejectReceipt = (receiptId: string, reason: string) => {
+    setReceipts(prev =>
+      prev.map(r =>
+        r.id === receiptId
+          ? {
+              ...r,
+              status: 'rejected',
+              rejectionReason: reason,
+              reviewedAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+              reviewedBy: 'DE PHANTOM (Lead Admin)'
+            }
+          : r
+      )
+    );
+    showToast(`Payment receipt marked as rejected: ${reason}`, 'info');
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -630,22 +774,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         communityPosts,
         leaderboard,
         announcements,
+        bankAccounts,
+        receipts,
         activePage,
         selectedCourseId,
         selectedLessonId,
         selectedPromptCategory,
         isAssistantOpen,
+        isReceiptModalOpen,
         toasts,
         navigate,
         setAssistantOpen,
+        setReceiptModalOpen,
         showToast,
         removeToast,
         enrollCourse,
         completeLesson,
+        toggleLessonComplete,
         copyPrompt,
         toggleSavePrompt,
         claimCertificate,
         upgradeToPro,
+        submitReceipt,
+        approveReceipt,
+        rejectReceipt,
         likePost,
         addComment,
         createPost,

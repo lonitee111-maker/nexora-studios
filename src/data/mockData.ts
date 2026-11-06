@@ -1,4 +1,4 @@
-import { Course, PromptItem, AITool, CommunityPost, LeaderboardEntry, PlatformAnnouncement } from '../types/index.js';
+import { Course, PromptItem, AITool, CommunityPost, LeaderboardEntry, PlatformAnnouncement, BankAccountDetail, PaymentReceipt } from '../types/index.js';
 import { Badge } from '../utils/gamification.js';
 
 export const INITIAL_BADGES: Badge[] = [
@@ -884,3 +884,77 @@ export const INITIAL_ANNOUNCEMENTS: PlatformAnnouncement[] = [
     tag: 'Update'
   }
 ];
+
+export const OFFICIAL_BANK_ACCOUNTS: BankAccountDetail[] = [
+  {
+    id: 'bank-opay-ayomide',
+    bankName: 'OPay Digital Services (OPay)',
+    accountName: 'Ayomide Omojola Emmanuel',
+    accountNumber: '9134992916',
+    currency: 'NGN',
+    branchOrSortCode: '999992',
+    instructions: 'Instant transfer via OPay app or any Nigerian commercial bank app / USSD. Fast confirmation.'
+  },
+  {
+    id: 'bank-opay-jesuloni',
+    bankName: 'OPay Digital Services (OPay)',
+    accountName: 'JESULONI ENOCH AYODELE',
+    accountNumber: '8127933781',
+    currency: 'NGN',
+    branchOrSortCode: '999992',
+    instructions: 'Instant transfer via OPay app or any Nigerian commercial bank app / USSD. Fast confirmation.'
+  },
+  {
+    id: 'bank-kuda-ngn',
+    bankName: 'Kuda Microfinance Bank',
+    accountName: 'Nexora Studios Academy',
+    accountNumber: '2001948572',
+    currency: 'NGN',
+    instructions: 'Zero-fee instant transfer from Kuda or any commercial bank.'
+  },
+  {
+    id: 'bank-wire-usd',
+    bankName: 'Nexora Global USD Domiciliary & Wire',
+    accountName: 'Nexora Studios International',
+    accountNumber: '0492817492',
+    currency: 'USD',
+    swiftCode: 'OPAYNGLA',
+    instructions: 'For international wire or USD transfers. Please upload SWIFT receipt.'
+  }
+];
+
+export const INITIAL_RECEIPTS: PaymentReceipt[] = [
+  {
+    id: 'rcp-101',
+    studentName: 'Amara Okafor',
+    studentEmail: 'amara.okafor@gmail.com',
+    plan: 'pro_yearly',
+    amount: 385950,
+    currency: 'NGN',
+    bankName: 'OPay Digital Services (OPay)',
+    senderAccountName: 'Amara Chioma Okafor',
+    transactionReference: 'OPAY-TRF-20261105-9842',
+    receiptImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop',
+    notes: 'Paid ₦385,950 for 1 Year Nexora Pro membership to Ayomide Omojola Emmanuel (OPay 9134992916). Please approve full access.',
+    submittedAt: 'Today at 08:45 AM',
+    status: 'pending'
+  },
+  {
+    id: 'rcp-102',
+    studentName: 'Babatunde Adeleke',
+    studentEmail: 'tunde.adeleke@gmail.com',
+    plan: 'pro_monthly',
+    amount: 44950,
+    currency: 'NGN',
+    bankName: 'Zenith Bank PLC',
+    senderAccountName: 'Babatunde Adeleke',
+    transactionReference: 'ZEN-APP-8841920',
+    receiptImage: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?q=80&w=800&auto=format&fit=crop',
+    notes: 'Transfer verified and confirmed.',
+    submittedAt: 'Yesterday at 04:20 PM',
+    status: 'approved',
+    reviewedAt: 'Yesterday at 04:35 PM',
+    reviewedBy: 'DE PHANTOM (Lead Admin)'
+  }
+];
+

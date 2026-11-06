@@ -182,3 +182,33 @@ export interface LeaderboardEntry {
   isPro: boolean;
   badge: string;
 }
+
+export interface BankAccountDetail {
+  id: string;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  currency: 'NGN' | 'USD' | 'EUR' | 'GBP';
+  branchOrSortCode?: string;
+  swiftCode?: string;
+  instructions?: string;
+}
+
+export interface PaymentReceipt {
+  id: string;
+  studentName: string;
+  studentEmail: string;
+  plan: 'pro_monthly' | 'pro_yearly' | 'enterprise';
+  amount: number;
+  currency: string;
+  bankName: string;
+  senderAccountName: string;
+  transactionReference: string;
+  receiptImage?: string;
+  notes?: string;
+  submittedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+}

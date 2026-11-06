@@ -4,6 +4,7 @@ import { Navbar } from './components/layout/Navbar.js';
 import { Footer } from './components/layout/Footer.js';
 import { ToastContainer } from './components/ui/ToastContainer.js';
 import { AIAssistantDrawer } from './components/ai/AIAssistantDrawer.js';
+import { ReceiptUploadModal } from './components/payment/ReceiptUploadModal.js';
 
 // Pages
 import { HomePage } from './pages/HomePage.js';
@@ -74,6 +75,7 @@ const MainRouter: React.FC = () => {
       <Footer />
       <ToastContainer />
       <AIAssistantDrawer />
+      <ReceiptUploadModal />
     </div>
   );
 };

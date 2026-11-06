@@ -14,7 +14,12 @@ import {
   CheckCircle2,
   BarChart3,
   TrendingUp,
-  X
+  X,
+  Clock,
+  Eye,
+  Receipt,
+  Building2,
+  AlertCircle
 } from 'lucide-react';
 
 export const AdminDashboardPage: React.FC = () => {
@@ -22,6 +27,9 @@ export const AdminDashboardPage: React.FC = () => {
     courses,
     prompts,
     announcements,
+    receipts,
+    approveReceipt,
+    rejectReceipt,
     user,
     navigate,
     adminAddCourse,
@@ -31,7 +39,9 @@ export const AdminDashboardPage: React.FC = () => {
     showToast
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'courses' | 'prompts' | 'announcements' | 'students'>('courses');
+  const [activeTab, setActiveTab] = useState<'courses' | 'prompts' | 'announcements' | 'students' | 'receipts'>('receipts');
+  const [receiptFilter, setReceiptFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [selectedReceiptForPreview, setSelectedReceiptForPreview] = useState<string | null>(null);
 
   // New Course Form Modal State
   const [isAddCourseModalOpen, setIsAddCourseModalOpen] = useState(false);
@@ -275,10 +285,24 @@ export const AdminDashboardPage: React.FC = () => {
       </div>
 
       {/* Tabs Control */}
-      <div className="flex border-b border-white/10 text-xs font-semibold space-x-6">
+      <div className="flex border-b border-white/10 text-xs font-semibold space-x-6 overflow-x-auto pb-px">
+        <button
+          onClick={() => setActiveTab('receipts')}
+          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap ${
+            activeTab === 'receipts' ? 'border-purple-500 text-purple-300 font-bold' : 'border-transparent text-slate-400 hover:text-white'
+          }`}
+        >
+          <Receipt className="w-4 h-4 text-cyan-400" />
+          <span>Payment Receipts & Approvals</span>
+          {receipts.filter(r => r.status === 'pending').length > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              {receipts.filter(r => r.status === 'pending').length} Pending
+            </span>
+          )}
+        </button>
         <button
           onClick={() => setActiveTab('courses')}
-          className={`pb-3 border-b-2 transition-colors ${
+          className={`pb-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
             activeTab === 'courses' ? 'border-purple-500 text-purple-300 font-bold' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
@@ -286,7 +310,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('prompts')}
-          className={`pb-3 border-b-2 transition-colors ${
+          className={`pb-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
             activeTab === 'prompts' ? 'border-purple-500 text-purple-300 font-bold' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
@@ -294,7 +318,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('announcements')}
-          className={`pb-3 border-b-2 transition-colors ${
+          className={`pb-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
             activeTab === 'announcements' ? 'border-purple-500 text-purple-300 font-bold' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
@@ -302,7 +326,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('students')}
-          className={`pb-3 border-b-2 transition-colors ${
+          className={`pb-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
             activeTab === 'students' ? 'border-purple-500 text-purple-300 font-bold' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
@@ -506,6 +530,273 @@ export const AdminDashboardPage: React.FC = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* TAB 5: PAYMENT RECEIPTS & APPROVALS (DE PHANTOM Lead Admin) */}
+      {activeTab === 'receipts' && (
+        <div className="space-y-6">
+          {/* Header Notice */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-purple-950/40 via-[#0e1222] to-black border border-purple-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  CONFIRMATION DESK
+                </span>
+                <span className="text-xs text-slate-400">
+                  Lead Officer: <strong className="text-white">DE PHANTOM</strong> (Nexora Executive Administration)
+                </span>
+              </div>
+              <h2 className="text-xl font-heading font-bold text-white">
+                Direct Bank Transfer Receipts & Manual Access Registration
+              </h2>
+              <p className="text-xs text-slate-300 max-w-2xl">
+                Review submitted bank transfer proof slips from students who transferred to OPay (Ayomide Omojola Emmanuel / JESULONI ENOCH AYODELE), Kuda, or USD Wire. Once verified against your account ledger, click <strong>"Approve & Register Full Access"</strong> to activate their Nexora Pro Architect membership.
+              </p>
+            </div>
+
+            {/* Quick Stats Badges */}
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="p-3 rounded-xl bg-black/60 border border-white/10 text-center min-w-[90px]">
+                <div className="text-[10px] font-mono text-slate-400 uppercase">Pending</div>
+                <div className="text-lg font-black font-heading text-amber-400">
+                  {receipts.filter(r => r.status === 'pending').length}
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-black/60 border border-white/10 text-center min-w-[90px]">
+                <div className="text-[10px] font-mono text-slate-400 uppercase">Approved</div>
+                <div className="text-lg font-black font-heading text-emerald-400">
+                  {receipts.filter(r => r.status === 'approved').length}
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-black/60 border border-white/10 text-center min-w-[90px]">
+                <div className="text-[10px] font-mono text-slate-400 uppercase">Total Value</div>
+                <div className="text-lg font-black font-heading text-cyan-300">
+                  ₦{receipts.filter(r => r.status === 'approved').reduce((acc, r) => acc + (r.currency === 'NGN' ? r.amount : r.amount * 1550), 0).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex items-center gap-2">
+            {(['all', 'pending', 'approved', 'rejected'] as const).map(f => (
+              <button
+                key={f}
+                onClick={() => setReceiptFilter(f)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                  receiptFilter === f
+                    ? 'bg-purple-600 text-white font-bold'
+                    : 'bg-black/40 text-slate-400 hover:text-white border border-white/10'
+                }`}
+              >
+                {f} ({f === 'all' ? receipts.length : receipts.filter(r => r.status === f).length})
+              </button>
+            ))}
+          </div>
+
+          {/* Receipts List */}
+          <div className="space-y-4">
+            {receipts.filter(r => receiptFilter === 'all' || r.status === receiptFilter).length === 0 ? (
+              <div className="p-12 text-center rounded-2xl glass-card text-slate-400 text-xs">
+                No payment receipts found under "{receiptFilter}".
+              </div>
+            ) : (
+              receipts
+                .filter(r => receiptFilter === 'all' || r.status === receiptFilter)
+                .map(receipt => {
+                  return (
+                    <div
+                      key={receipt.id}
+                      className="p-6 rounded-2xl glass-card border border-white/10 hover:border-purple-500/30 transition-all flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
+                    >
+                      {/* Left: Student & Transfer Information */}
+                      <div className="space-y-3 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-heading font-bold text-base text-white">
+                            {receipt.studentName}
+                          </span>
+                          <span className="text-xs text-slate-400 font-mono">({receipt.studentEmail})</span>
+
+                          {/* Status Pill */}
+                          {receipt.status === 'pending' && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              Pending Verification
+                            </span>
+                          )}
+                          {receipt.status === 'approved' && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Approved & Full Access Granted
+                            </span>
+                          )}
+                          {receipt.status === 'rejected' && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" />
+                              Rejected
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Transfer Details Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-black/40 p-3.5 rounded-xl border border-white/5 font-mono">
+                          <div>
+                            <div className="text-[10px] text-slate-500 uppercase">Plan Selected</div>
+                            <div className="font-bold text-purple-300 uppercase">
+                              {receipt.plan.replace('_', ' ')}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] text-slate-500 uppercase">Amount Transferred</div>
+                            <div className="font-bold text-emerald-400">
+                              {receipt.currency} {receipt.amount.toLocaleString()}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] text-slate-500 uppercase">Receiving Bank</div>
+                            <div className="text-white truncate" title={receipt.bankName}>
+                              {receipt.bankName}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] text-slate-500 uppercase">Reference / Session</div>
+                            <div className="text-cyan-300 truncate" title={receipt.transactionReference}>
+                              {receipt.transactionReference}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Meta: Sender Account Name, Sub Date, Review Details */}
+                        <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-[11px] text-slate-400">
+                          <div>
+                            Sender Account Name: <strong className="text-slate-200">{receipt.senderAccountName}</strong>
+                          </div>
+                          <div>•</div>
+                          <div>
+                            Submitted: <span className="text-slate-300">{receipt.submittedAt}</span>
+                          </div>
+                          {receipt.reviewedBy && (
+                            <>
+                              <div>•</div>
+                              <div className="text-purple-300">
+                                Confirmed by: <strong>{receipt.reviewedBy}</strong> ({receipt.reviewedAt})
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        {receipt.notes && (
+                          <div className="text-xs text-slate-300 italic bg-purple-950/20 p-2.5 rounded-lg border border-purple-500/20">
+                            Student Note: "{receipt.notes}"
+                          </div>
+                        )}
+
+                        {receipt.rejectionReason && (
+                          <div className="text-xs text-rose-300 bg-rose-950/30 p-2.5 rounded-lg border border-rose-500/30">
+                            Rejection Reason: {receipt.rejectionReason}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Middle: Receipt Document Slip Thumbnail */}
+                      <div className="shrink-0 flex flex-col items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedReceiptForPreview(receipt.receiptImage || null)}
+                          className="w-28 h-28 rounded-xl overflow-hidden border border-purple-500/40 relative group cursor-pointer bg-black"
+                          title="Click to inspect receipt document"
+                        >
+                          <img
+                            src={receipt.receiptImage}
+                            alt="Payment Receipt Slip"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[11px] font-bold gap-1">
+                            <Eye className="w-5 h-5 text-cyan-400" />
+                            <span>Inspect Slip</span>
+                          </div>
+                        </button>
+                        <span className="text-[10px] text-slate-500 font-mono">Proof of Payment</span>
+                      </div>
+
+                      {/* Right: Decision Buttons for DE PHANTOM / Admins */}
+                      <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-2 w-full lg:w-44">
+                        {receipt.status === 'pending' ? (
+                          <>
+                            <button
+                              onClick={() => approveReceipt(receipt.id)}
+                              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-600/30 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                              <span>Approve & Grant Full Access</span>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                const reason = window.prompt('Enter reason for rejecting receipt (e.g. Deposit not found in ledger):');
+                                if (reason) {
+                                  rejectReceipt(receipt.id, reason);
+                                }
+                              }}
+                              className="w-full py-2 px-3 rounded-xl text-xs font-semibold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-colors cursor-pointer"
+                            >
+                              Reject Receipt
+                            </button>
+                          </>
+                        ) : receipt.status === 'approved' ? (
+                          <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-center space-y-1">
+                            <div className="text-[11px] font-bold text-emerald-400 flex items-center justify-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              Pro Access Active
+                            </div>
+                            <div className="text-[10px] text-slate-400 font-mono">
+                              Learner Registered
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/30 text-center text-[11px] text-rose-300 font-semibold">
+                            Receipt Rejected
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Full Receipt Image Lightbox */}
+      {selectedReceiptForPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in">
+          <div className="relative max-w-2xl w-full bg-[#090b14] border border-purple-500/40 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <h4 className="font-heading font-bold text-sm text-white">Payment Proof Inspection Slip</h4>
+              <button
+                onClick={() => setSelectedReceiptForPreview(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white bg-white/5 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-auto rounded-xl bg-black flex items-center justify-center p-2">
+              <img
+                src={selectedReceiptForPreview}
+                alt="Enlarged Payment Receipt"
+                className="max-h-[65vh] w-auto object-contain rounded-lg shadow-2xl"
+              />
+            </div>
+            <div className="text-right">
+              <button
+                onClick={() => setSelectedReceiptForPreview(null)}
+                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white hover:bg-white/20 cursor-pointer"
+              >
+                Close Preview
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

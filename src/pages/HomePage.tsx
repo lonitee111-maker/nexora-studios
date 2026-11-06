@@ -73,6 +73,25 @@ export const HomePage: React.FC = () => {
         <div className="absolute top-20 right-1/4 w-80 h-80 bg-cyan-500/15 rounded-full blur-[120px] pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          {/* Official Theme Logo Crest */}
+          <div className="flex flex-col items-center justify-center mb-6">
+            <div className="relative group">
+              <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-amber-400 via-purple-600 to-cyan-400 opacity-70 blur-xl group-hover:opacity-100 transition duration-500 animate-pulse"></div>
+              <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1 bg-gradient-to-tr from-amber-400 via-purple-600 to-cyan-400 shadow-2xl shadow-purple-600/40">
+                <img
+                  src="/assets/nexora-logo.jpeg"
+                  alt="Nexora Studios Official Emblem"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              </div>
+            </div>
+            <div className="mt-3.5 flex items-center gap-2 text-[11px] font-mono tracking-wider text-amber-300 font-bold uppercase">
+              <span>NEXORA STUDIOS</span>
+              <span className="text-slate-500">•</span>
+              <span className="text-purple-300">BUILDING BEYOND IMAGINATION</span>
+            </div>
+          </div>
+
           {/* Brand Tag Pill */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-8 shadow-sm">
             <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />

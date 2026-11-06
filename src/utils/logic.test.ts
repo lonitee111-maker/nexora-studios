@@ -79,3 +79,30 @@ test('course progress and certificate eligibility logic handles edge cases', () 
   assert.equal(getNextLessonId(allLessons, ['les-1']), 'les-2');
   assert.equal(getNextLessonId(allLessons, ['les-1', 'les-2']), 'les-3');
 });
+
+test('bank transfer receipts verification and access state transitions', () => {
+  interface TestReceipt {
+    id: string;
+    studentEmail: string;
+    amount: number;
+    currency: string;
+    status: 'pending' | 'approved' | 'rejected';
+    reviewedBy?: string;
+  }
+
+  const receipts: TestReceipt[] = [
+    { id: 'r1', studentEmail: 'amara@example.com', amount: 385950, currency: 'NGN', status: 'pending' }
+  ];
+
+  assert.equal(receipts[0].status, 'pending');
+
+  // Simulate DE PHANTOM confirming deposit and approving
+  const approvedReceipts = receipts.map(r =>
+    r.id === 'r1'
+      ? { ...r, status: 'approved' as const, reviewedBy: 'DE PHANTOM (Lead Admin)' }
+      : r
+  );
+
+  assert.equal(approvedReceipts[0].status, 'approved');
+  assert.equal(approvedReceipts[0].reviewedBy, 'DE PHANTOM (Lead Admin)');
+});

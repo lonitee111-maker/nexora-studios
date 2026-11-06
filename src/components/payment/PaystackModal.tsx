@@ -27,7 +27,7 @@ export const PaystackModal: React.FC<PaystackModalProps> = ({
   currency,
   onClose
 }) => {
-  const { user, upgradeToPro, showToast } = useApp();
+  const { user, upgradeToPro, showToast, bankAccounts, setReceiptModalOpen } = useApp();
   const pricing = calculatePlanCost(planId, interval, currency);
 
   const [email, setEmail] = useState(user?.email || 'learner@nexora.dev');
@@ -102,8 +102,12 @@ export const PaystackModal: React.FC<PaystackModalProps> = ({
         {/* Modal Top Bar */}
         <div className="px-6 py-4 border-b border-purple-500/20 bg-gradient-to-r from-purple-950/60 to-black/80 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="w-9 h-9 rounded-full p-0.5 bg-gradient-to-tr from-amber-400 via-purple-600 to-cyan-400 shrink-0">
+              <img
+                src="/assets/nexora-logo.jpeg"
+                alt="Nexora Studios Emblem"
+                className="w-full h-full rounded-full object-cover"
+              />
             </div>
             <div>
               <div className="text-xs font-bold text-white flex items-center gap-1.5">
@@ -285,11 +289,28 @@ export const PaystackModal: React.FC<PaystackModalProps> = ({
             )}
 
             {selectedChannel === 'bank' && (
-              <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 text-xs text-slate-300 space-y-2">
-                <div className="text-[11px] text-slate-400">Pay via Direct Bank Transfer:</div>
-                <div className="font-mono text-purple-300 font-bold">Wema Bank / Titan Trust</div>
-                <div className="font-mono text-white text-sm">Account: 9942 8104 22</div>
-                <div className="text-[10px] text-slate-400">Account Name: Nexora Studios Payments</div>
+              <div className="p-3.5 rounded-xl bg-black/60 border border-purple-500/30 text-xs text-slate-300 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-slate-400">Official Transfer Accounts:</span>
+                  <span className="text-[10px] text-cyan-300 font-mono">Manual or USSD</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-black/80 border border-white/10 space-y-1">
+                  <div className="text-white font-bold text-xs">{bankAccounts[0]?.bankName || 'OPay Digital Services (OPay)'}</div>
+                  <div className="font-mono text-cyan-400 font-bold text-sm tracking-wider">
+                    {bankAccounts[0]?.accountNumber || '9134992916'}
+                  </div>
+                  <div className="text-[10px] text-slate-400">Name: {bankAccounts[0]?.accountName || 'Ayomide Omojola Emmanuel'}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    setReceiptModalOpen(true);
+                  }}
+                  className="w-full py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 font-semibold text-[11px] transition-colors cursor-pointer"
+                >
+                  View All Accounts & Upload Receipt →
+                </button>
               </div>
             )}
 
@@ -318,6 +339,20 @@ export const PaystackModal: React.FC<PaystackModalProps> = ({
                 </>
               )}
             </button>
+
+            {/* Offline manual transfer shortcut */}
+            <div className="pt-1 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  setReceiptModalOpen(true);
+                }}
+                className="text-xs text-purple-300 hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
+              >
+                Can't use card? Transfer to bank & send receipt instead →
+              </button>
+            </div>
 
             <div className="text-center text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
               <span>Secured by</span>

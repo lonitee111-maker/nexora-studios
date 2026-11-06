@@ -9,12 +9,15 @@ import {
   CreditCard,
   ChevronDown,
   Lock,
-  ArrowRight
+  ArrowRight,
+  Building2,
+  UploadCloud,
+  Copy
 } from 'lucide-react';
 import { PaystackModal } from '../components/payment/PaystackModal.js';
 
 export const PricingPage: React.FC = () => {
-  const { user, navigate, showToast } = useApp();
+  const { user, navigate, showToast, bankAccounts, setReceiptModalOpen } = useApp();
 
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('yearly');
   const [currency, setCurrency] = useState<CurrencyCode>('USD');
@@ -288,6 +291,95 @@ export const PricingPage: React.FC = () => {
             >
               Upgrade Team with Paystack
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Direct Bank Transfer & Receipt Verification Section */}
+      <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-950/40 via-[#0a0d1d] to-black border border-purple-500/30 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="relative z-10 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-mono font-bold uppercase mb-2">
+                <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+                <span>CAN'T USE CARD? DIRECT BANK TRANSFER AVAILABLE</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-heading font-black text-white">
+                Transfer to Our Accounts & Send Receipt
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl mt-1">
+                If you prefer not to use card details, make a direct electronic transfer to any of our corporate bank accounts. Submit your receipt, and our administration team led by <strong>DE PHANTOM</strong> will manually confirm your deposit and grant full Pro access!
+              </p>
+            </div>
+
+            <button
+              onClick={() => setReceiptModalOpen(true)}
+              className="px-6 py-3.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 shadow-xl shadow-purple-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0"
+            >
+              <UploadCloud className="w-4 h-4" />
+              <span>Upload Payment Receipt</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Quick Bank Accounts Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+            {bankAccounts.map((account) => (
+              <div
+                key={account.id}
+                className="p-4 rounded-2xl bg-black/60 border border-white/10 hover:border-purple-500/40 transition-colors space-y-2.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-heading font-bold text-xs text-white truncate">
+                    {account.bankName}
+                  </span>
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                    {account.currency}
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-400 truncate">
+                  {account.accountName}
+                </div>
+                <div className="p-2 rounded-lg bg-purple-950/30 border border-purple-500/20 flex items-center justify-between">
+                  <span className="font-mono font-bold text-xs text-cyan-300 tracking-wider">
+                    {account.accountNumber}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      try {
+                        if (navigator.clipboard?.writeText) {
+                          navigator.clipboard.writeText(account.accountNumber).catch(() => {});
+                        }
+                      } catch (e) {}
+                      showToast(`Copied ${account.bankName} account number: ${account.accountNumber}`, 'success');
+                    }}
+                    className="p-1 rounded text-purple-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                    title="Copy Account Number"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 3 Step Workflow */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 text-xs border-t border-white/10">
+            <div className="flex items-center gap-2.5 text-slate-300">
+              <span className="w-6 h-6 rounded-full bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center font-mono font-bold shrink-0 text-[11px]">1</span>
+              <span>Copy our bank details and transfer the exact plan amount.</span>
+            </div>
+            <div className="flex items-center gap-2.5 text-slate-300">
+              <span className="w-6 h-6 rounded-full bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center font-mono font-bold shrink-0 text-[11px]">2</span>
+              <span>Click "Upload Payment Receipt" and attach your transfer screenshot/slip.</span>
+            </div>
+            <div className="flex items-center gap-2.5 text-slate-300">
+              <span className="w-6 h-6 rounded-full bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center font-mono font-bold shrink-0 text-[11px]">3</span>
+              <span>DE PHANTOM / Admins confirm and register you with <strong>Full Pro Access</strong>.</span>
+            </div>
           </div>
         </div>
       </div>

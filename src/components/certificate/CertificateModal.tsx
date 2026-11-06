@@ -48,16 +48,18 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ certificate,
           <div className="relative z-10 text-center space-y-6">
             {/* Header Emblem */}
             <div className="flex items-center justify-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 p-0.5 flex items-center justify-center">
-                <div className="w-full h-full bg-[#07070f] rounded-[10px] flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-purple-400" />
-                </div>
+              <div className="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-amber-400 via-purple-600 to-cyan-400 shadow-lg shadow-purple-500/30 shrink-0">
+                <img
+                  src="/assets/nexora-logo.jpeg"
+                  alt="Nexora Studios Emblem"
+                  className="w-full h-full rounded-full object-cover"
+                />
               </div>
               <div className="text-left">
                 <div className="font-heading font-black text-2xl tracking-wider text-white">
                   NEXORA
                 </div>
-                <div className="text-[10px] font-mono tracking-widest text-cyan-400 font-semibold uppercase">
+                <div className="text-[10px] font-mono tracking-widest text-amber-300 font-semibold uppercase">
                   AI ACADEMY • CREDENTIAL VERIFICATION
                 </div>
               </div>
@@ -99,15 +101,14 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ certificate,
 
               {/* Gold Verification Seal */}
               <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-200 p-0.5 shadow-lg shadow-amber-500/20 flex items-center justify-center">
-                  <div className="w-full h-full bg-[#0a0c16] rounded-full flex flex-col items-center justify-center p-1">
-                    <ShieldCheck className="w-5 h-5 text-amber-400" />
-                    <span className="text-[8px] font-mono text-amber-300 font-bold uppercase mt-0.5">
-                      VERIFIED
-                    </span>
-                  </div>
+                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-200 p-0.5 shadow-xl shadow-amber-500/30 flex items-center justify-center">
+                  <img
+                    src="/assets/nexora-logo.jpeg"
+                    alt="Nexora Studios Seal"
+                    className="w-full h-full rounded-full object-cover"
+                  />
                 </div>
-                <span className="text-[9px] text-slate-500 mt-1 font-mono">NEXORA STUDIOS</span>
+                <span className="text-[9px] text-amber-300 mt-1 font-mono font-bold tracking-wider">OFFICIAL GOLD SEAL</span>
               </div>
 
               <div className="text-right font-mono">

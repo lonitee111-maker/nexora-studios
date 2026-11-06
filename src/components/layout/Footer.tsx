@@ -25,19 +25,26 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
           {/* Brand Info */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 p-0.5">
-                <div className="w-full h-full bg-[#07070f] rounded-[10px] flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-purple-400" />
-                </div>
+            <div className="flex items-center gap-3.5 mb-4">
+              <div className="relative flex items-center justify-center w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-amber-400 via-purple-500 to-cyan-400 shadow-xl shadow-purple-500/25 shrink-0">
+                <img
+                  src="/assets/nexora-logo.jpeg"
+                  alt="Nexora Studios Logo"
+                  className="w-full h-full rounded-full object-cover"
+                />
               </div>
               <div>
-                <span className="font-heading font-black text-xl tracking-wider text-white">
-                  NEXORA
-                </span>
-                <span className="text-[10px] font-mono tracking-widest px-1.5 py-0.5 ml-2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase font-semibold">
-                  AI ACADEMY
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-heading font-black text-xl tracking-wider text-white">
+                    NEXORA
+                  </span>
+                  <span className="text-[10px] font-mono tracking-widest px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase font-semibold">
+                    AI ACADEMY
+                  </span>
+                </div>
+                <div className="text-[10px] font-mono font-bold text-amber-300 tracking-wider">
+                  NEXORA STUDIOS • BUILDING BEYOND IMAGINATION
+                </div>
               </div>
             </div>
 
@@ -46,8 +53,8 @@ export const Footer: React.FC = () => {
             </p>
 
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-300 font-mono mb-6">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span>POWERED BY <strong className="text-cyan-400 font-semibold">NEXORA STUDIOS</strong></span>
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span>APPS • WEBSITES • GAMES • INNOVATION</span>
             </div>
 
             {/* Newsletter input */}
